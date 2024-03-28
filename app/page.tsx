@@ -4,18 +4,19 @@ import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
 import * as topojson from "topojson-client";
 
-function draw(containerRef: React.RefObject<HTMLDivElement>, japan: any) {
-  if (!containerRef.current) return;
+function draw(svgRef: React.RefObject<SVGSVGElement>, japan: any) {
+  if (!svgRef.current) return;
 
   // Create an SVG element and append it to the container div
-  const svg = d3
-    .select(containerRef.current)
-    .append("svg")
-    .attr("width", 960)
-    .attr("height", 600);
+  const svg = d3.select(svgRef.current);
 
   const geojson = topojson.feature(japan, japan.objects.japan);
-  const projection = d3.geoMercator().fitSize([960, 600], geojson);
+  const newjson = {
+    type: geojson.type,
+    features: geojson.features,
+  };
+
+  const projection = d3.geoMercator().fitSize([960, 600], newjson);
   const path = d3.geoPath().projection(projection);
 
   function handleMouseover(e: any, d: any) {
@@ -25,7 +26,7 @@ function draw(containerRef: React.RefObject<HTMLDivElement>, japan: any) {
     let measure = path.measure(d);
 
     d3.select("#content .info").text(
-      d.properties.name +
+      d.properties.nam +
         " (path.area = " +
         pixelArea.toFixed(1) +
         " path.measure = " +
@@ -33,29 +34,28 @@ function draw(containerRef: React.RefObject<HTMLDivElement>, japan: any) {
         ")"
     );
 
-    d3.select("#content .bounding-box rect")
-      .attr("x", bounds[0][0])
-      .attr("y", bounds[0][1])
-      .attr("width", bounds[1][0] - bounds[0][0])
-      .attr("height", bounds[1][1] - bounds[0][1]);
-
     d3.select("#content .centroid")
       .style("display", "inline")
       .attr("transform", "translate(" + centroid + ")");
 
+    // d3.select("#content .bounding-box rect")
+    //   .attr("x", bounds[0][0])
+    //   .attr("y", bounds[0][1])
+    //   .attr("width", bounds[1][0] - bounds[0][0])
+    //   .attr("height", bounds[1][1] - bounds[0][1]);
+
     console.log(d.properties.nam);
   }
 
-//   svg
-//     .append("path")
-//     .attr("stroke-width", 0.5)
-//     .attr("d", path(topojson.feature(japan, japan.objects.country)));
+  //   svg
+  //     .append("path")
+  //     .attr("stroke-width", 0.5)
+  //     .attr("d", path(topojson.feature(japan, japan.objects.country)));
 
-//   svg.append();
+  //   svg.append();
 
   const u = svg
-    .append("g")
-    .attr("class", "map")
+    .select(".map")
     .selectAll("path")
     .data(geojson.features);
 
@@ -64,35 +64,27 @@ function draw(containerRef: React.RefObject<HTMLDivElement>, japan: any) {
   u.enter()
     .append("path")
     .attr("class", "tract")
+    .attr("stroke", "black")
+    .attr("stroke-width", 0.5)
     .attr("d", path)
     .on("mouseover", handleMouseover);
 
-  // Append the style for hover effects
-  svg.append("style").text(`
-      .tract {fill: #eee;}
-      .tract:hover {fill: orange;}
-      .tract-border {
-        fill: none;
-        stroke: #777;
-        pointer-events: none;
-      }
-      .country {
-        fill: none;
-        stroke: black;
-        stroke-width: 0.1;
-      }
-    `);
 }
 
 const JapanMap: React.FC = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
+  const isMounted = useRef<boolean>(false);
 
   useEffect(() => {
-    d3.json("https://raw.githubusercontent.com/dataofjapan/land/master/japan.topojson")
+    d3.json(
+      "https://raw.githubusercontent.com/dataofjapan/land/master/japan.topojson"
+    )
       .then((japan: any) => {
-        if (containerRef.current) {
-          draw(containerRef, japan);
+        if (svgRef.current && !isMounted.current) {
+          draw(svgRef, japan);
         }
+
+        isMounted.current = true;
       })
       .catch((error) => {
         console.error(error);
@@ -100,7 +92,20 @@ const JapanMap: React.FC = () => {
       });
   }, []);
 
-  return <div ref={containerRef} />;
+  return (
+    <div id="content">
+      <div className="info">Hover over a country</div>
+      <svg ref={svgRef} width="960px" height="600px">
+        <g className="map"></g>
+        <g className="bounding-box">
+          <rect></rect>
+        </g>
+        <g className="centroid">
+          <circle r="2"></circle>
+        </g>
+      </svg>
+    </div>
+  );
 };
 
 export default JapanMap;
