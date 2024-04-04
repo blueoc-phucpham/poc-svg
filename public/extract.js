@@ -1,31 +1,68 @@
 var fs = require('fs');
 var obj;
-fs.readFile('./municipalities.topojson', 'utf8', function (err, data) {
+fs.readFile('./public/municipalities.topojson', 'utf8', function (err, data) {
     if (err) throw err;
     obj = JSON.parse(data);
 
-    console.log(JSON.stringify((obj.objects.municipalities)))
+    // console.log(JSON.stringify((obj.objects.municipalities)))
 
     const cities = [];
 
-    // for (prop of obj.features) {
-    //     // console.log(prop.properties)
+    for (prop of obj.objects.municipalities.geometries) {
+        // console.log(prop.properties)
 
-    //     // const idstr = prop.properties.GID_1.split("_")[0].substr(4);
+        // const idstr = prop.properties.GID_1.split("_")[0].substr(4);
 
-    //     const new_props = {
-    //         name_en: prop.properties.VARNAME_1,
-    //         name_jp: prop.properties.NL_NAME_1,
-    //         id: parseInt(prop.properties.ISO_1.substr(3)),
-    //         // str: prop.properties.ISO_1
-    //     }
+        const regex = /JPN\.(\d{1,2})\.(\d{1,2})_\d/gm;
 
-    //     console.log(new_props);
+        // Alternative syntax using RegExp constructor
+        // const regex = new RegExp('JPN\\.(\\d{1,2})\\.(\\d{1,2})_\\d', 'gm')
 
-    //     prop.properties = new_props;
-    //     cities.push(new_props);
-    // }
-    // console.log(cities.filter((item) => !isNaN(item.id)).sort((a,b) => a.id - b.id), cities.filter((item) => !isNaN(item.id)).sort((a,b) => a.id - b.id).length)
-    // console.log(JSON.stringify(obj));
+        const str = prop.properties.GID_2;
+        let m;
+        let prepectureID = 0;
+        let id = 0;
+
+        while ((m = regex.exec(str)) !== null) {
+            // This is necessary to avoid infinite loops with zero-width matches
+            if (m.index === regex.lastIndex) {
+                regex.lastIndex++;
+            }
+
+            // The result can be accessed through the `m`-variable.
+            m.forEach((match, groupIndex) => {
+                // console.log(`Found match, group ${groupIndex}: ${match}`);
+                if (groupIndex === 1) {
+                    prepectureID = parseInt(match);
+                }
+
+                if (groupIndex === 2) {
+                    id = parseInt(match);
+                }
+            });
+
+        }
+
+
+        const new_props = {
+            id: id,
+            name_en: prop.properties.VARNAME_1,
+            name_jp: prop.properties.NL_NAME_1,
+            type: prop.properties.ENGTYPE_2,
+            prepecture: {
+                id: prepectureID,
+                name_jp: prop.properties.NL_NAME_2,
+                name_en: prop.properties.NAME_2,
+            }
+            // str: prop.properties.ISO_1
+        }
+
+        // console.log(new_props);
+
+        prop.properties = new_props;
+        cities.push(prop.properties);
+    }
+
+    console.log(JSON.stringify(obj));
 
 });

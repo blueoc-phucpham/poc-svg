@@ -54,27 +54,27 @@ export const prefectureColumns: PrefectureMapColumn[] = [
   {
     name: 'tohoku',
     positions: ['Aomori', 'Iwate', 'Miyagi', 'Akita', 'Yamagata', 'Fukushima'],
-    style: { right: '10%', bottom: '40%' },
+    style: { right: '10%', bottom: '20%' },
   },
   {
     name: 'kanto',
     positions: ['Tokyo', 'Kanagawa', 'Saitama', 'Chiba', 'Ibaraki', 'Tochigi', 'Gunma'],
-    style: { right: '20%', bottom: '5%' },
+    style: { right: '20%', bottom: '10%' },
   },
   {
     name: 'hokkaido',
     positions: ['Hokkaido'],
-    style: { right: '30%', bottom: '90%' },
+    style: { right: '45%', bottom: '80%' },
   },
   {
     name: 'hokuriku',
     positions: ['Niigata', 'Toyama', 'Ishikawa', 'Fukui', 'Yamanashi', 'Nagano'],
-    style: { right: '40%', bottom: '65%' },
+    style: { right: '60%', bottom: '65%' },
   },
   {
     name: 'chubu',
     positions: ['Osaka', 'Shiga', 'Kyoto', 'Hyogo', 'Nara', 'Wakayama'],
-    style: { right: '50%', bottom: '60%' },
+    style: { right: '70%', bottom: '50%' },
   },
   {
     name: 'tokai',
@@ -84,21 +84,21 @@ export const prefectureColumns: PrefectureMapColumn[] = [
   {
     name: 'shikoku',
     positions: ['Tokushima', 'Kagawa', 'Ehime', 'Kochi'],
-    style: { right: '45%', bottom: '5%' },
+    style: { right: '40%', bottom: '10%' },
   },
   {
     name: 'kyushu',
     positions: ['Fukuoka', 'Saga', 'Nagasaki', 'Kumamoto', 'Oita', 'Miyazaki', 'Kagoshima'],
-    style: { right: '70%', bottom: '10%' },
+    style: { right: '90%', bottom: '20%' },
   },
   {
     name: 'okinawa',
     positions: ['Okinawa'],
-    style: { right: '70%', bottom: '80%' },
+    style: { right: '70%', bottom: '10%' },
   },
   {
     name: 'chugoku',
     positions: ['Tottori', 'Shimane', 'Okayama', 'Hiroshima', 'Yamaguchi'],
-    style: { right: '60%', bottom: '50%' },
+    style: { right: '80%', bottom: '40%' },
   },
 ];

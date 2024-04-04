@@ -1,27 +1,17 @@
 "use client";
 
+import MunicipalitieMap from "@/components/MunicipalitieMap";
 import PrefectureMap from "@/components/PrefectureMap";
 import { useState } from "react";
 
 const Index = () => {
-  const [zoom, setZoom] = useState(1);
+    const [selectedId, setSelectedId] = useState(1);
 
   return (
     <>
-      <button
-        className="p-1 text-black rounded m-2 bg-gray-200"
-        onClick={() => setZoom(zoom + 1)}
-      >
-        zoom in
-      </button>
-      <button
-        className="p-1 text-black rounded m-2 bg-gray-200"
-        onClick={() => setZoom(zoom - 0.1)}
-      >
-        zoom out
-      </button>
-      <div className="">
-        <PrefectureMap></PrefectureMap>
+      <div className="flex flex-col gap-1 w-screen">
+        <PrefectureMap selectedId={selectedId} onSelected={(id) => setSelectedId(id)}></PrefectureMap>
+        <MunicipalitieMap id={selectedId}></MunicipalitieMap>
       </div>
     </>
   );

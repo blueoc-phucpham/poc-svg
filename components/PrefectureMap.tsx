@@ -18,17 +18,20 @@ interface Feature<G extends Geometry | null = Geometry> extends GeoJsonObject {
   };
 }
 
-interface MapProps {}
+interface MapProps {
+  selectedId: number;
 
-const PrefectureMap = ({}: MapProps) => {
+  onSelected: (id: number) => void;
+}
+
+const PrefectureMap = ({ selectedId, onSelected }: MapProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const [selectedId, setSelectedId] = useState(0);
   const [geoData, setGeoData] = useState<Topology>();
 
   useEffect(() => {
     const fetchTopologies = async () => {
-      const data = (await d3.json("prefectures.topojson")) as Topology;
+      const data = (await d3.json("prefectures.topojson.bak")) as Topology;
       setGeoData(data);
     };
 
@@ -39,53 +42,17 @@ const PrefectureMap = ({}: MapProps) => {
     const container = containerRef.current;
 
     if (geoData && container) {
-      const map = d3.select("#japan-map-svg .main-map");
-      const okinawaMap = d3.select("#japan-map-svg .okinawa-map");
-
+      const svg = d3.select("#japan-map-svg");
       const json = topojson.feature(geoData, geoData.objects.prefectures);
       const geojson = json as FeatureCollection;
-
-      const mainIslands = {
-        type: geojson.type,
-        features: geojson.features.filter(
-          (feature) => feature.properties && feature.properties.id <= 46
-        ),
-      };
-      /* Render okinawa specially to zoom the map beter */
-      const okinawaIsland = {
-        type: geojson.type,
-        features: geojson.features.filter(
-          (feature) => feature.properties && feature.properties.id > 46
-        ),
-      };
-
       const projection = d3
         .geoMercator()
         .rotate([90, -15])
-        .fitExtent(
-          [
-            [container.clientWidth * 0.2, 0],
-            [container.clientWidth, container.clientHeight],
-          ],
-          mainIslands
-        );
-      const okinawaProjection = d3
-        .geoMercator()
-        .rotate([90, -15])
-        .fitExtent(
-          [
-            [-container.clientWidth, 0],
-            [container.clientWidth, container.clientHeight],
-          ],
-          okinawaIsland
-        );
-
+        .fitSize([container.clientWidth, container.clientHeight], geojson);
       const path = d3.geoPath().projection(projection);
-      const features = mainIslands.features as Feature[];
-      const okinawa = d3.geoPath().projection(okinawaProjection);
-      const okinawaFeatures = okinawaIsland.features as Feature[];
+      const features = geojson.features as Feature[];
 
-      map
+      svg
         .selectAll(".tract")
         .data(features)
         .enter()
@@ -96,19 +63,6 @@ const PrefectureMap = ({}: MapProps) => {
         .attr("stroke-width", 0.5)
         .attr("d", path)
         .attr("fill", "#cccccc");
-
-      okinawaMap
-        .selectAll(".tract")
-        .data(okinawaFeatures)
-        .enter()
-        .append("path")
-        .attr("id", (d) => "prefecture-" + String(d.properties.id))
-        .attr("class", "tract")
-        .attr("stroke", "black")
-        .attr("stroke-width", 0.5)
-        .attr("d", okinawa)
-        .attr("fill", "#cccccc");
-
     }
   }, [geoData]);
 
@@ -119,11 +73,11 @@ const PrefectureMap = ({}: MapProps) => {
   }, [selectedId]);
 
   const onMouseOver = (prefecture: Prefecture) => {
-    setSelectedId(prefecture.id);
+    // onSelected(prefecture.id);
   };
 
   const onMouseOut = () => {
-    setSelectedId(0);
+    // onSelected(0);
   };
 
   return (
@@ -144,6 +98,7 @@ const PrefectureMap = ({}: MapProps) => {
                 key={item.id}
                 onMouseOver={() => onMouseOver(item)}
                 onMouseOut={() => onMouseOut()}
+                onClick={() => onSelected(item.id)}
                 className="text-sm flex cursor-pointer text-slate-900 rounded shadow bg-gray-50 hover:bg-gray-200 px-2 py-1"
               >
                 <span className="m-auto">{item.name_en}</span>
@@ -151,10 +106,7 @@ const PrefectureMap = ({}: MapProps) => {
             ))}
         </div>
       ))}
-      <svg id="japan-map-svg" className="w-full h-full absolute">
-        <g className="main-map"></g>
-        <g className="okinawa-map"></g>
-      </svg>
+      <svg id="japan-map-svg" className="w-full h-full absolute" />
     </div>
   );
 };
