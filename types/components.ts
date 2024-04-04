@@ -4,6 +4,7 @@ export interface Prefecture {
   id: number;
   name_en: string;
   name_jp: string;
+  municipalities: Municipalitie[]
 }
 
 export enum MunicipalitieType {
@@ -20,8 +21,8 @@ export enum MunicipalitieType {
 export interface Municipalitie {
     id:         number;
     name_jp:    string;
-    type:       MunicipalitieType;
-    prepecture: Prefecture;
+    name_en: string;
+    type:       string;
 }
 
 export interface PrefectureMapColumn {

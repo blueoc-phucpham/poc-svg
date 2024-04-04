@@ -19,19 +19,24 @@ interface Feature<G extends Geometry | null = Geometry> extends GeoJsonObject {
 }
 
 interface MapProps {
-  selectedId: number;
-
-  onSelected: (id: number) => void;
+  selectedIds: Set<number>;
+  onPerfectureSelected: (id: number) => void;
 }
 
-const PrefectureMap = ({ selectedId, onSelected }: MapProps) => {
+const PrefectureMap = ({ selectedIds, onPerfectureSelected }: MapProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
-
   const [geoData, setGeoData] = useState<Topology>();
+
+  const selectedButtons = prefectures.map((p) => {
+    return {
+        ...p,
+        selected: selectedIds.has(p.id)
+    }
+  })
 
   useEffect(() => {
     const fetchTopologies = async () => {
-      const data = (await d3.json("prefectures.topojson.bak")) as Topology;
+      const data = (await d3.json("prefectures.topojson")) as Topology;
       setGeoData(data);
     };
 
@@ -57,28 +62,29 @@ const PrefectureMap = ({ selectedId, onSelected }: MapProps) => {
         .data(features)
         .enter()
         .append("path")
-        .attr("id", (d) => "prefecture-" + String(d.properties.id))
-        .attr("class", "tract")
+        .attr("class", "idle")
         .attr("stroke", "black")
         .attr("stroke-width", 0.5)
+        .attr("data-id", (prop) => prop.properties.id)
         .attr("d", path)
         .attr("fill", "#cccccc");
     }
   }, [geoData]);
 
   useEffect(() => {
-    d3.selectAll("#japan-map-svg .tract").attr("fill", "#cccccc");
-    const pathElement = d3.select(`#prefecture-${selectedId}`);
-    pathElement.attr("fill", "#8EC1E2");
-  }, [selectedId]);
+    const allPaths = d3.selectAll("#japan-map-svg .idle");
+    const selectedPaths = d3
+      .selectAll("#japan-map-svg .idle")
+      .filter((data, index, group) => {
+        const feature = data as Feature;
+        return selectedIds.has(feature.properties.id);
+      });
 
-  const onMouseOver = (prefecture: Prefecture) => {
-    // onSelected(prefecture.id);
-  };
+    allPaths.attr("fill", "#cccccc");
+    selectedPaths.attr("fill", "#8EC1E2");
 
-  const onMouseOut = () => {
-    // onSelected(0);
-  };
+
+  }, [selectedIds]);
 
   return (
     <div
@@ -91,15 +97,13 @@ const PrefectureMap = ({ selectedId, onSelected }: MapProps) => {
           className="absolute z-10 flex flex-col gap-2"
           style={column.style}
         >
-          {prefectures
+          {selectedButtons
             .filter((item) => column.positions.includes(item.name_en))
             .map((item) => (
               <button
                 key={item.id}
-                onMouseOver={() => onMouseOver(item)}
-                onMouseOut={() => onMouseOut()}
-                onClick={() => onSelected(item.id)}
-                className="text-sm flex cursor-pointer text-slate-900 rounded shadow bg-gray-50 hover:bg-gray-200 px-2 py-1"
+                onClick={() => onPerfectureSelected(item.id)}
+                className={`text-sm flex cursor-pointer text-slate-900 rounded shadow px-2 py-1 bg-gray-50 hover:bg-gray-200 ${item.selected && "bg-blue-200 hover:bg-blue-400"}`}
               >
                 <span className="m-auto">{item.name_en}</span>
               </button>

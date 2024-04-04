@@ -1,6 +1,6 @@
 var fs = require('fs');
 var obj;
-fs.readFile('./public/municipalities.topojson', 'utf8', function (err, data) {
+fs.readFile('/home/ppvan/Documents/code/works/Nursing/poc-svg/public/municipalities.topojson', 'utf8', function (err, data) {
     if (err) throw err;
     obj = JSON.parse(data);
 
@@ -13,10 +13,7 @@ fs.readFile('./public/municipalities.topojson', 'utf8', function (err, data) {
 
         // const idstr = prop.properties.GID_1.split("_")[0].substr(4);
 
-        const regex = /JPN\.(\d{1,2})\.(\d{1,2})_\d/gm;
-
-        // Alternative syntax using RegExp constructor
-        // const regex = new RegExp('JPN\\.(\\d{1,2})\\.(\\d{1,2})_\\d', 'gm')
+        const regex = /JPN\.(\d+)\.(\d+)_\d/gm;
 
         const str = prop.properties.GID_2;
         let m;
@@ -46,15 +43,14 @@ fs.readFile('./public/municipalities.topojson', 'utf8', function (err, data) {
 
         const new_props = {
             id: id,
-            name_en: prop.properties.VARNAME_1,
-            name_jp: prop.properties.NL_NAME_1,
+            name_en: prop.properties.NAME_2,
+            name_jp: prop.properties.NL_NAME_2,
             type: prop.properties.ENGTYPE_2,
             prepecture: {
                 id: prepectureID,
-                name_jp: prop.properties.NL_NAME_2,
-                name_en: prop.properties.NAME_2,
+                name_jp: prop.properties.NL_NAME_1,
+                name_en: prop.properties.NAME_1,
             }
-            // str: prop.properties.ISO_1
         }
 
         // console.log(new_props);
@@ -63,6 +59,6 @@ fs.readFile('./public/municipalities.topojson', 'utf8', function (err, data) {
         cities.push(prop.properties);
     }
 
-    console.log(JSON.stringify(obj));
+    console.log(JSON.stringify(cities));
 
 });

@@ -27,7 +27,7 @@ interface Feature<G extends Geometry | null = Geometry> extends GeoJsonObject {
 }
 
 interface MapProps {
-  id: number;
+  selectedIds: number[];
 }
 
 const MunicipalitieMap = ({ id }: MapProps) => {

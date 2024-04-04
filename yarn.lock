@@ -2169,6 +2169,11 @@ jiti@^1.19.1:
   resolved "https://registry.yarnpkg.com/jiti/-/jiti-1.21.0.tgz#7c97f8fe045724e136a397f7340475244156105d"
   integrity sha512-gFqAIbuKyyso/3G2qhiO2OM6shY6EPP/R0+mkDbyspxKazh8BXDC5FiFsUjlczgdNz/vfra0da2y+aHrusLG/Q==
 
+jp-prefecture@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/jp-prefecture/-/jp-prefecture-0.2.1.tgz#dbea3a7d3d9b6a56c8fdc6b5637600425381b144"
+  integrity sha512-cQAB0sdqmvVE/kC50rBNcqnABn2w+hi0KUHUSWnq1tt1qumGrsbJv5bCRXWbSm7+RhBHYMHwDZxcrVmOHpJwNQ==
+
 jpn-atlas@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/jpn-atlas/-/jpn-atlas-1.0.2.tgz#40fbd436e9d86f3e5f100e1849208f1ed030820a"

@@ -12,6 +12,7 @@
     "@types/d3": "^7.4.3",
     "@types/topojson": "^3.2.6",
     "d3": "^7.9.0",
+    "jp-prefecture": "^0.2.1",
     "jpn-atlas": "^1.0.2",
     "next": "14.1.4",
     "react": "^18",
